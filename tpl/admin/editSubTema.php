@@ -90,7 +90,7 @@
                             <div class="control-group">
                                 <label for="cmb-curso" class="control-label">Curso:</label>
                                 <div class="controls">
-                                    <select class="input-xxlarge" id="cmb-curso" name="cod_curso" required="required">
+                                    <select class="input-xxlarge" id="cmb-curso" name="cod_curso" required="required" data-allow-change="true">
                                         <option value="0">Seleccionar...</option>
                                         <?php if($results["formAction"]=="editSubtema"): ?>
                                         <option selected="selected" value="<?php echo $results["subtema"]->obj_tema->obj_curso->cod_curso;?>"><?php echo $results["subtema"]->obj_tema->obj_curso->curso;?></option>

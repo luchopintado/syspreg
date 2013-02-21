@@ -13,7 +13,7 @@
 class NivelDificultad extends EntityBase {
 
     var $cod_niveldificultad = '';
-    var $nivel = '';
+    var $niveldificultad = '';
 
     public function __construct($options = array()) {
         parent::__construct($options);
@@ -35,7 +35,7 @@ class NivelDificultad extends EntityBase {
             trigger_error("NivelDificultad::insert(): Intento de insertar un objeto NIVELDIFICULTAD que ya tiene asignada su propiedad ID (valor: $this->cod_niveldificultad).", E_USER_ERROR);
         }
         $q = "INSERT INTO niveldificultad (nivel) VALUES('%s')";
-        $q = sprintf($q, $this->nivel);
+        $q = sprintf($q, $this->niveldificultad);
         DB::query($q);
         return DB::getMySQLiObject();
     }
@@ -70,7 +70,7 @@ class NivelDificultad extends EntityBase {
             trigger_error("NivelDificultad::update(): Intento de actualizar un objeto NIVELDIFICULTAD que no tiene ajustado su propiedad ID.", E_USER_ERROR);
         }
         $sql = "UPDATE niveldificultad SET nivel='%s' WHERE $this->cod_niveldificultad='%d'";
-        $sql = sprintf($sql, $this->nivel);
+        $sql = sprintf($sql, $this->niveldificultad);
         DB::query($sql);
         return DB::getMySQLiObject();
     }

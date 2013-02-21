@@ -72,6 +72,16 @@
                                     </select>                                    
                                 </div>
                             </div>
+                            
+                            <div class="control-group">
+                                <label for="cmb-capacidad" class="control-label">Capacidad:</label>
+                                <div class="controls">
+                                    <select class="input-xxlarge" id="cmb-capacidad" name="id_capacidad" required="required">
+                                        <option value="0">Seleccionar...</option>
+                                    </select>                                    
+                                </div>
+                            </div>
+                            
                             <div class="control-group">
                                 <label for="cmb-tema" class="control-label">Tema:</label>
                                 <div class="controls">
@@ -83,7 +93,7 @@
                             <div class="control-group">
                                 <label for="cmb-subtema" class="control-label">Subtema (Opcional):</label>
                                 <div class="controls">
-                                    <select class="input-xxlarge" id="cmb-subtema" name="cod_subtema" required="required">
+                                    <select class="input-xxlarge" id="cmb-subtema" name="cod_subtema">
                                         <option value="0">Seleccionar...</option>
                                     </select>                                    
                                 </div>
@@ -91,12 +101,12 @@
                             
                             <legend>Numero de Preguntas</legend>
                             <div class="control-group">          
-                                <label class="control-label">Nivel de dificultad</label>
+                                <label class="control-label">Nivel de dificultad:</label>
                                 <div class="controls">
                                     <?php $nivelesdificultad = NivelDificultad::getList();?>
                                     <?php foreach ($nivelesdificultad["nivelesdificultad"] as $nd): ?>
-                                    <label for="txt-nropreguntas-basico" class="control-label inline"><?php echo $nd->nivel;?>
-                                        <input type="number" min="0" step="1" class="input-mini" name="nropreguntas-<?php echo $nd->cod_niveldificultad; ?>" id="txt-nropreguntas-<?php echo $nd->cod_niveldificultad; ?>"  value=""/>
+                                    <label for="txt-nropreguntas-basico" class="control-label inline"><?php echo $nd->niveldificultad;?>
+                                        <input type="number" min="0" step="1" class="input-mini" name="nropreguntas-<?php echo $nd->cod_niveldificultad; ?>" id="txt-nropreguntas-<?php echo $nd->cod_niveldificultad; ?>"  value="" required="required"/>
                                     </label>
                                     <?php endforeach; ?>                                    
                                 </div>                                
@@ -104,7 +114,9 @@
                             <div class="control-group">
                                 <label for="txt-nropreguntas" class="control-label">Total de preguntas:</label>
                                 <div class="controls">
-                                    <input type="text" class="input-mini" name="nro_preguntas" id="txt-nropreguntas"  value="" readonly="readonly"/>
+                                    <label for="txt-nropreguntas" class="control-label inline">
+                                        <input type="text" class="input-mini" name="nro_preguntas" id="txt-nropreguntas"  value="" readonly="readonly"/>                                        
+                                    </label>
                                 </div>
                             </div>
                             
@@ -114,7 +126,7 @@
                                     <?php $tipoevaluaciones = TipoEvaluacion::getList();?>
                                     <?php foreach ($tipoevaluaciones["tipoevaluaciones"] as $te): ?>
                                     <label class="radio inline">
-                                        <input type="radio" data-label="<?php echo $te->tipoevaluacion; ?>" name="cod_tipoevaluacion" value="<?php echo $te->cod_tipoevaluacion; ?>"> <?php echo $te->tipoevaluacion; ?>
+                                        <input type="radio" data-label="<?php echo $te->tipoevaluacion; ?>" name="rb_tipoevaluacion" value="<?php echo $te->cod_tipoevaluacion; ?>"> <?php echo $te->tipoevaluacion; ?>
                                     </label>                                    
                                     <?php endforeach; ?>
                                 </div>
@@ -134,16 +146,18 @@
                                 </div>
                             </div>
                             
+                            <hr/>
                             
                             <div class="control-group">
                                 <div class="controls pull-left">
-                                    <button type="submit" name="saveChanges" value="Guardar Cambios" class="btn btn-primary ">Generar evaluaci&oacute;n</button>                        
+                                    <button type="submit" name="saveChanges" class="btn">Generar evaluaci&oacute;n autom&aacute;ticamente</button>                                                            
+                                    <a href="admin_eval.php?action=getQuestions" id="btn-editar-alternativa" role="button" class="btn" data-toggle="modal">Generar evaluaci&oacute;n manualmente</a>
                                 </div>
                             </div>
 
                         </form>
                         
-                        <form action="admin_eval.php?action=saveEvaluation" method="post" class="form-horizontal eval-form" id="form-vistaprevia">
+                        <form action="admin_eval.php?action=exportMSWord" method="post" class="form-horizontal eval-form" id="form-vistaprevia">
                             
                             <legend>Vista previa</legend>                                
                             <div class="control-group">
@@ -153,11 +167,11 @@
                                 <div id="render-eval">
                                 </div>
                             </div>
+                            <hr/>
                             <div class="control-group">
                                 <div class="controls pull-right">
-                                    <button type="submit" name="print" value="Imprimir" class="btn"><i class="icon-print"></i> Imprimir</button>                        
-                                    <button type="submit" name="export" value="Exportar" class="btn"><i class="icon-file"></i> Exportar PDF</button>
-                                    <button type="submit" name="saveChanges" value="Guardar Cambios" class="btn btn-primary "><i class="icon-hdd icon-white"></i> Guardar evaluaci&oacute;n</button>                        
+                                    <!-- Guarda cambios en la base de datos y te manda a descargar en WORD-->
+                                    <button type="submit" name="saveChanges" value="Guardar Evaluacion" class="btn btn-primary "><i class="icon-hdd icon-white"></i> Guardar evaluaci&oacute;n</button>
                                 </div>
                             </div>
                         </form>
@@ -166,10 +180,24 @@
                     </div>
                 </div>
             </div>
-
         </div>
-        
     </div>
+    
+    
+    <div id="modalPreguntas" class="modal hide fade modal-preguntas" tabindex="-1" role="dialog" aria-labelledby="modalPreguntas" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="myModalLabel">Seleccionar preguntas</h3>
+        </div>
+        <div class="modal-body">
+            
+        </div>
+        <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Cerrar</button>
+            <button class="btn btn-primary" id="btn-generar-evaluacion">Generar Evaluaci&oacute;n</button>
+        </div>
+    </div>
+    
     <?php include TEMPLATE_PATH . '/inc/footer.php';?>
     <?php include TEMPLATE_PATH . '/inc/scripts.php';?>
     
@@ -188,14 +216,16 @@
             function validar_formulario(){
                 var error = 0;
                 $("input[required]").each(function(){
-                    error++;
+                    if($(this).val() === ""){
+                        error++;                        
+                    }
                 });
                 if(error>0){
                     alert("Debe llenar los campos obligatorios");
                     return false;
                 }
                 
-                if($("input[name=rb-tipoevaluacion]:checked").size() === 0){
+                if($("input[name=rb_tipoevaluacion]:checked").size() === 0){
                     alert("Debes seleccionar un tipo de evaluacion");
                     return false;
                 }
@@ -211,6 +241,7 @@
                 evt.preventDefault();
                 
                 if(!validar_formulario()){
+                    alert("Debe llenar los campos obligatorios del formulario!");
                     return false;
                 }
                 
@@ -220,51 +251,108 @@
                     $formulario.attr("action"),
                     $formulario.serialize(),
                     function(data){
-                        if(data.preguntas){
-                            var tpl = '<ol>';
-                            //var alt_num = ["A", "B", "C", "D", "E", "F"];
-                            $.each(data.preguntas, function(idx, el){
-                                tpl += '<li>';
-                                tpl += '<p>'+el.enunciado+'</p><br/>';
-                                tpl += '<ol>';
-                                $.each(el.alternativas.alternativas, function(myidx, myel){
-                                    tpl += '<li>'+myel.valor+'</li>';
-                                });
-                                tpl += '</ol>';
-                                tpl += '<br/><br/>';
-                                tpl += '</li>';
-                            });
-                            tpl += '</ol>';
-                            $("#render-eval").html(tpl);
-                        }else{
-                            alert("Error");
-                        }
+                        render_table(data);
+                    },
+                    'json'
+                );                
+            });
+            
+            function render_table(data){
+                if(data.preguntas){
+                    var tpl = '<ol>';
+                    //var alt_num = ["A", "B", "C", "D", "E", "F"];
+                    $.each(data.preguntas, function(idx, el){
+                        tpl += '<li>';
+                        tpl += '<p>'+el.enunciado+'</p><br/>';
+                        tpl += '<ol>';
+                        $.each(el.alternativas.alternativas, function(myidx, myel){
+                            tpl += '<li>'+myel.valor+'</li>';
+                        });
+                        tpl += '</ol>';
+                        tpl += '<br/><br/>';
+                        tpl += '</li>';
+                    });
+                    tpl += '</ol>';
+                    $("#render-eval").html(tpl);
+                }else{
+                    alert("Error");
+                }
+            }
+            
+            $("#form-vistaprevia").submit(function(evt){            
+                if(!validar_formulario()){                    
+                    return false;
+                }                
+                return true;
+            });
+            
+            $("#tabla-preguntas tbody tr").live("click", function(){
+                var $this = $(this);
+                $this.toggleClass("info");
+            });
+            
+            $("#btn-generar-evaluacion").click(function(){
+                var ids = [];
+                $("#tabla-preguntas tbody tr.info").each(function(){
+                    var $this = $(this);
+                    ids.push($this.data("item"));
+                });
+                
+                $.post(
+                    'admin_eval.php?action=getSelectedQuestions',
+                    {
+                        'ids[]':ids
+                    },
+                    function(data){                        
+                        render_table(data);
+                        $('#modalPreguntas').modal('hide');
                     },
                     'json'
                 );
             });
             
-            $("#form-vistaprevia").submit(function(evt){            
-                evt.preventDefault();
-                
-                if(!validar_formulario()){
-                    return false;
+            $('[data-toggle="modal"]').click(function(e) {
+                e.preventDefault();
+                var url = $(this).attr('href');
+                if (url.indexOf('#') === 0) {
+                    $(url).modal('open');
+                } else {
+                    $("input[type=number]").val("0");
+                    if(!validar_formulario()){
+                        alert("Debe llenar los campos obligatorios del formulario!");
+                        return;
+                    }
+                    var data = $("#form-generarevaluacion").serialize();
+                    $.post(url, data, function(data) {
+                        var tpl = '';
+                        tpl += '<table class="table table-bordered table-striped table-hover" id="tabla-preguntas">';
+                        tpl += '    <colgroup>';
+                        tpl += '        <col width="50"/>';
+                        tpl += '        <col/>';
+                        tpl += '    </colgroup>';
+                        tpl += '    <thead>';
+                        tpl += '        <tr>';
+                        tpl += '            <th>#</th>';
+                        tpl += '            <th>Enunciado</th>';
+                        tpl += '            <th>Dificultad</th>';
+                        tpl += '        </tr>';
+                        tpl += '    </thead>';
+                        tpl += '    <tbody>';
+                        $.each(data.preguntas, function(idx, el){
+                            tpl += '        <tr data-item="'+el.cod_pregunta+'">';
+                            tpl += '            <td>'+(idx+1)+'</td>';
+                            tpl += '            <td>'+el.enunciado+'</td>';
+                            tpl += '            <td>'+el.obj_niveldificultad.niveldificultad+'</td>';
+                            tpl += '        </tr>';                            
+                        });
+                        tpl += '    </tbody>';
+                        tpl += '</table>';
+                        
+                        var $modal = $("#modalPreguntas");
+                        $modal.find("div.modal-body").html(tpl);
+                        $modal.modal();
+                    }, 'json');
                 }
-                
-                $formulario = $(this);
-                $data = $("#form-vistaprevia, #form-generarevaluacion").serialize();
-                $.post(
-                    $formulario.attr("action"),
-                    $data,
-                    function(data){
-                        if(data.success){
-                            alert("Evaluacion guardada con exito");
-                        }else{
-                            alert("Error al guardar evaluacion");
-                        }
-                    },
-                    "json"
-                );
             });
         });
     </script>

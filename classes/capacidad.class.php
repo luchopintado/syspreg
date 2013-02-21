@@ -65,6 +65,22 @@ class Capacidad extends EntityBase {
         $fila = $result->fetch_assoc();
         return array("capacidades" => $capacidads, "totalRows" => $fila["totalRows"]);
     }
+    
+    public static function getByArea($idarea) {
+        $q = "SELECT c.* FROM capacidad c            
+            INNER JOIN areas a on c.cod_area=a.cod_area
+            WHERE a.cod_area='$idarea'
+            ORDER BY c.cod_capacidad";
+        
+        $result = DB::query($q);
+        $capacidades = array();
+        while ($c = $result->fetch_assoc()) {
+            $capacidad = new Capacidad($c);
+            $capacidades[] = $capacidad;
+        }
+
+        return array("capacidades" => $capacidades, "totalRows" => count($capacidades));
+    }
 
     public function delete() {
         if (is_null($this->cod_capacidad)) {

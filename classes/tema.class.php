@@ -17,6 +17,7 @@ class Tema extends EntityBase {
     var $cod_grado = '';
     var $cod_trimestre = '';
     var $tema = '';
+    var $id_capacidad = '';
     
     var $obj_curso;
     var $obj_grado;
@@ -38,6 +39,13 @@ class Tema extends EntityBase {
             }
         }
         
+        if (isset($options["id_capacidad"])) {
+            if ($options["id_capacidad"] == "") {
+                $options["id_capacidad"] = null;
+            }
+        }
+        
+        
         $this->__construct($options);
     }
     
@@ -45,8 +53,8 @@ class Tema extends EntityBase {
         if (!is_null($this->cod_tema)) {
             trigger_error("Tema::insert(): Intento de insertar un objeto TEMA que ya tiene asignada su propiedad ID (valor: $this->cod_tema).", E_USER_ERROR);
         }
-        $q = "INSERT INTO tema (cod_curso, cod_grado, cod_trimestre, tema) VALUES('%d', '%d', '%d', '%s')";
-        $q = sprintf($q, $this->cod_curso, $this->cod_grado,  $this->cod_trimestre, $this->tema);
+        $q = "INSERT INTO tema (cod_curso, cod_grado, cod_trimestre, tema, id_capacidad) VALUES('%d', '%d', '%d', '%s', %s)";
+        $q = sprintf($q, $this->cod_curso, $this->cod_grado,  $this->cod_trimestre, $this->tema, $this->id_capacidad);
         DB::query($q);
         return DB::getMySQLiObject();
     }
@@ -68,7 +76,7 @@ class Tema extends EntityBase {
         return null;
     }
     
-    public static function getByFields($opts, $numRows=10, $order="cod_tema"){
+    public static function getByFields($opts, $numRows=10, $order="t.cod_tema"){
         $arr_opts = array();
         foreach($opts as $opt){
             $arr_opts[] = sprintf("%s %s '%s'", $opt["field"], $opt["operator"], $opt["value"]);

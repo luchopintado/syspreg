@@ -32,7 +32,12 @@
                                     <?php $trimestres = Trimestre::getList();?>
                                     <?php foreach ($trimestres["trimestres"] as $t): ?>
                                     <label class="radio inline">
-                                        <input type="radio" data-label="<?php echo $t->trimestre; ?>" name="cod_trimestre" id="rb-cod-trimestre-<?php echo $t->cod_trimestre; ?>" value="<?php echo $t->cod_trimestre; ?>">Trimestre <?php echo $t->trimestre; ?></label>                                    
+                                        <?php if($results["tema"]->cod_trimestre === $t->cod_trimestre): ?>
+                                            <?php $seleccionado = 'checked="checked"';?>
+                                        <?php else:?>
+                                            <?php $seleccionado = '';?>
+                                        <?php endif; ?>
+                                        <input type="radio" <?php echo $seleccionado;?> data-label="<?php echo $t->trimestre; ?>" name="cod_trimestre" id="rb-cod-trimestre-<?php echo $t->cod_trimestre; ?>" value="<?php echo $t->cod_trimestre; ?>">Trimestre <?php echo $t->trimestre; ?></label>                                    
                                     <?php endforeach; ?>
                             </div>
                             
@@ -95,6 +100,18 @@
                                         <option value="0">Seleccionar...</option>
                                         <?php if($results["formAction"]=="editTema"): ?>
                                         <option selected="selected" value="<?php echo $results["tema"]->obj_curso->cod_curso;?>"><?php echo $results["tema"]->obj_curso->curso;?></option>
+                                        <?php endif; ?>
+                                    </select>                                    
+                                </div>
+                            </div>
+                            
+                            <div class="control-group">
+                                <label for="cmb-capacidad" class="control-label">Capacidad:</label>
+                                <div class="controls">
+                                    <select class="input-xxlarge" id="cmb-capacidad" name="id_capacidad" required="required">
+                                        <option value="0">Seleccionar...</option>
+                                        <?php if($results["formAction"]=="editTema"): ?>
+                                        <option selected="selected" value="<?php echo $results["tema"]->id_capacidad;?>"><?php echo Capacidad::getById($results["tema"]->id_capacidad)->capacidad;?></option>
                                         <?php endif; ?>
                                     </select>                                    
                                 </div>

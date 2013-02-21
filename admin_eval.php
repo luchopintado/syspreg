@@ -21,9 +21,7 @@ switch ($action) {
         formGenerarEvaluacion();
         break;
     
-    case 'ingresarPregunta':
-        formIngresarPregunta();
-        break;
+   
     
     case 'getGradoByNivel':
         getGradoByNivel();
@@ -41,12 +39,20 @@ switch ($action) {
         getCursoByAreaSimple();
         break;
     
+    case 'getCapacidadByArea':
+        getCapacidadByArea();
+        break;
+    
     case 'getCursoByGrado':
         getCursoByGrado();
         break;
     
     case 'getTemaByCurso':
         getTemaByCurso();        
+        break;
+    
+    case 'getTemaByCursoCapacidad':
+        getTemaByCursoCapacidad();        
         break;
     
     case 'getSubtemaByTema':
@@ -57,12 +63,16 @@ switch ($action) {
         getRandomQuestions();
         break;
     
-    case 'saveQuestion':
-        saveQuestion();
+    case 'getQuestions':
+        getQuestions();
         break;
     
-    case 'saveEvaluation':
-        saveEvaluation();
+    case 'getSelectedQuestions':
+        getSelectedQuestions();
+        break;
+    
+    case 'exportMSWord':
+        exportMSWord();
         break;
     
     default :
@@ -106,39 +116,6 @@ function formGenerarEvaluacion() {
     }
 }
 
-function formIngresarPregunta() {
-    $results = array();
-    
-    $data = Area::getList();
-    //$results["areas"] = $data["areas"];
-    $results["totalRows"] = $data["totalRows"];
-    $results["pageTitle"] = "Ingresar pregunta al banco";
-    $results["indice"] = "ingresar";
-    $results["formAction"] = "saveQuestion";
-    
-    if(isset($_GET["error"])){
-        if($_GET["error"] == "articleNotFound"){
-            $results["errorMessage"] = MESSAGE_ARTICLE_NOT_FOUND;
-        }
-    }
-    
-    if(isset($_GET["status"])){
-        if($_GET["status"] == "changesSaved"){
-            $results["statusMessage"] = MESSAGE_CHANGES_SAVED;
-        }
-        if($_GET["status"] == "articleDeleted"){
-            $results["statusMessage"] = MESSAGE_ARTICLE_DELETED;
-        }
-    }
-    //print_r($results);
-    //return;
-    if($data["totalRows"] == 0){
-        require TEMPLATE_PATH . "/admin_eval/ingresarPregunta.php";        
-    }else{
-        require TEMPLATE_PATH . "/admin_eval/ingresarPregunta.php";
-        
-    }
-}
 
 function listExamenes() {
     $results = array();
@@ -191,6 +168,13 @@ function getCursoByArea() {
     $cursos = Curso::getByAreaGrado($idarea, $idgrado);
     echo json_encode($cursos);
 }
+
+function getCapacidadByArea() {
+    $idarea = intval($_POST["idarea"]);    
+    $capacidades = Capacidad::getByArea($idarea);
+    echo json_encode($capacidades);
+}
+
 function getCursoByAreaSimple() {
     $idarea = intval($_POST["idarea"]);
     $cursos = Curso::getByFields(array(array("field"=>"c.cod_area", "operator"=>"=", "value"=>$idarea)));
@@ -206,6 +190,18 @@ function getCursoByGrado() {
 function getTemaByCurso() {
     $idcurso = intval($_POST["idcurso"]);
     $temas = Tema::getByFields(array(array("field"=>"t.cod_curso", "operator"=>"=", "value"=>$idcurso)));
+    echo json_encode($temas);
+}
+
+function getTemaByCursoCapacidad() {
+    $idcurso = intval($_POST["idcurso"]);
+    $idcapacidad = intval($_POST["idcapacidad"]);
+    $temas = Tema::getByFields(
+        array(
+            array("field"=>"t.cod_curso", "operator"=>"=", "value"=>$idcurso),
+            array("field"=>"t.id_capacidad", "operator"=>"=", "value"=>$idcapacidad)
+        )
+    );
     echo json_encode($temas);
 }
 
@@ -231,45 +227,82 @@ function getRandomQuestions() {
         $ids_preguntas[] = $preg->cod_pregunta;
     }
     //print_r($ids_preguntas);
+    unset($_SESSION["preguntas"]);
     $_SESSION["preguntas"] = serialize($ids_preguntas);
     
     echo json_encode(array("preguntas"=>$preguntas_total, "totalCount"=>count($preguntas_total)));
 }
 
-function saveQuestion() {
-    $question = new Pregunta;
-    $question->storeFormValues($_POST);
-    //print_r($_POST);return;
-    $mysqli = $question->insert();
-    $insert_id = $mysqli->insert_id;
-    if($mysqli->affected_rows == 1){
-        $alts = $_POST["alt"];
-        $resps = $_POST["resp"];
-        for($i=0; $i<5; $i++){
-            $alternativa = new Alternativa;
-            $options = array("cod_alternativa"=>"", "cod_pregunta"=>$insert_id, "valor"=>$alts[$i], "correcta"=>($resps[$i]==="true"?1:0));
-            $alternativa->storeFormValues($options);
-            $alternativa->insert();
-        }
-        return array("success"=>true);
-    }else{
-        return array("success"=>false);
-    }
+function getQuestions() {
+    $cod_curso = $_POST["cod_curso"];
+    $cod_grado = $_POST["cod_grado"];
+    //$cod_niveldificultad = $_POST["cod_niveldificultad"]; - No hay porque el usuario va elegir
+    
+    $id_tema = $_POST["id_tema"];
+    $id_subtema = $_POST["id_subtema"];
+    $id_capacidad = $_POST["id_capacidad"];
+    $id_tipopregunta = $_POST["rb_tipoevaluacion"];
+    
+    $resultado = Pregunta::getByFields(array(
+        array("field"=>"p.cod_curso", "operator"=>"=", "value"=>$cod_curso),
+        array("field"=>"p.cod_grado", "operator"=>"=", "value"=>$cod_grado),
+        array("field"=>"p.id_tipopregunta", "operator"=>"=", "value"=>$id_tipopregunta)
+    ));
+    
+    echo json_encode($resultado);
 }
 
-function saveEvaluation(){
+function getSelectedQuestions() {        
+    $ids = $_POST["ids"];
+    unset($_SESSION["preguntas"]);
+    $_SESSION["preguntas"] = serialize($ids);
+    $resultado = Pregunta::getByIds($ids);
+    echo json_encode($resultado);
+}
+
+function exportMSWord() {
+    $ids = unserialize($_SESSION["preguntas"]);
+    $preguntas = Pregunta::getByIds($ids);
+    //header("Content-type: application/vnd.ms-word");
+    //header("Content-Disposition: attachment;Filename=evaluacion.doc");
     
-    $evaluacion = new Evaluacion;
-    $evaluacion->storeFormValues($_POST);
-    $mysqli = $evaluacion->insert();
-    $insert_id = $mysqli->insert_id;
-    return;
-    if($mysqli->affected_rows == 1){
-        $preguntas = unserialize($_SESSION["preguntas"]);
-        $evaluacion->savePreguntas($preguntas);
-        return array("success"=>true);
-    }else{
-        return array("success"=>false);
+    echo '<html>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        
+        <style type="text/css">
+            .COLUMNS{
+            -moz-column-count: 2;
+            -moz-column-gap: 1.5em;
+            -moz-column-rule: none;
+            -webkit-column-count: 2;
+            -webkit-column-gap: 1.5em;
+            -webkit-column-rule: none;
+            column-count: 2;
+            column-gap: 1.5em;
+            column-rule: none;
+            }
+            </style>
+    </head>
+    <body>
+    <p>las preguntas son las siguientes'.join('-', $ids).'
+    </p>
+        <div class="COLUMNS">            
+            <ol style="list-style: decimal;">';
+    
+    foreach ($preguntas["preguntas"] as $preg) {        
+        echo '<li>'. $preg->enunciado .'</li>';
+        echo '<ol style="list-style: upper-alpha;">';
+        foreach($preg->alternativas["alternativas"] as $alt){
+            echo '<li>'. $alt->valor .'</li>';
+        }
+        echo '</ol>';
     }
+            
+    echo '</ol>
+            </div>
+        </body>
+    </html>';
 }
 ?>

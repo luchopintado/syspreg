@@ -1,5 +1,5 @@
 <?php
-
+/*
 require 'config.php';
 $action = isset($_GET["action"]) ? $_GET["action"] : "";
 
@@ -35,5 +35,7 @@ function homepage(){
     
     
     require TEMPLATE_PATH . '/homepage.php';
-}
+}*/
+
+header("Location: admin.php");
 ?>

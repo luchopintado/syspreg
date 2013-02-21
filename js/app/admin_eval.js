@@ -6,10 +6,13 @@
 $(function() {
     $("#cmb-nivel").live("change", getGradoByNivel);    
     $("#cmb-grado").live("change", getAreasByGrado);
-    $("#cmb-area").live("change", getCursoByArea);
+    $("#cmb-curso").live("change", getTemaByCurso);    
+    $("#cmb-area").live("change", function(){
+        getCursoByArea();
+        getCapacidadByArea();
+    });
     
-    
-    $("#cmb-curso").live("change", getTemaByCurso);
+    $("#cmb-capacidad").live("change", getTemaByCursoCapacidad);
     
     $("#cmb-tema").live("change", getSubtemaByTema);    
 });
@@ -128,8 +131,44 @@ function getCursoByArea(){
     );
 }
 
-function getTemaByCurso(){
-    var idcurso = $("#cmb-curso").val() * 1;
+function getCapacidadByArea(){
+    var idarea = $("#cmb-area").val() * 1;    
+    if(idarea === 0){
+        return;
+    }
+    var tpl = '<option value="0">Cargando ...</option>';
+    var $combo = $("#cmb-capacidad");
+    if($combo.size() === 0){
+        return;
+    }
+    $combo.html(tpl).attr("disabled", "true");
+    $.post(
+        'admin_eval.php?action=getCapacidadByArea',
+        {            
+            'idarea': idarea
+        },
+        function(data) {
+            if(data.capacidades){
+                tpl = '<option value="0">Seleccionar...</option>';
+                $.each(data.capacidades, function(idx, el){
+                    tpl += '<option value="'+el.cod_capacidad+'">'+el.capacidad+'</option>';
+                });
+                $combo.html(tpl).removeAttr("disabled");
+            }else{
+                alert("Ocurrio un error");
+            }
+        },
+        'json'
+    );
+}
+
+function getTemaByCurso(){    
+    var $combo_curso = $("#cmb-curso");
+    var idcurso = $combo_curso.val() * 1;
+    if(!$combo_curso.data("allow-change")){
+        return;
+    }
+    
     if(idcurso === 0){
         return;
     }
@@ -143,7 +182,41 @@ function getTemaByCurso(){
     $.post(
         'admin_eval.php?action=getTemaByCurso',
         {            
-            'idcurso': idcurso
+            'idcurso': idcurso            
+        },
+        function(data) {            
+            if(data.temas){
+                tpl = '<option value="0">Seleccionar...</option>';
+                $.each(data.temas, function(idx, el){
+                    tpl += '<option value="'+el.cod_tema+'">'+el.tema+'</option>';
+                });
+                $combo.html(tpl).removeAttr("disabled");
+            }else{
+                alert("Ocurrio un error");
+            }
+        },
+        'json'
+    );
+}
+
+function getTemaByCursoCapacidad(){
+    var idcurso = $("#cmb-curso").val() * 1;
+    var idcapacidad = $("#cmb-capacidad").val() * 1;
+    if(idcurso === 0 || idcapacidad === 0){
+        return;
+    }
+
+    var tpl = '<option value="0">Cargando ...</option>';
+    var $combo = $("#cmb-tema");
+    if($combo.size()<=0){
+        return;
+    }
+    $combo.html(tpl).attr("disabled", "true");
+    $.post(
+        'admin_eval.php?action=getTemaByCursoCapacidad',
+        {            
+            'idcurso': idcurso,
+            'idcapacidad': idcapacidad
         },
         function(data) {            
             if(data.temas){

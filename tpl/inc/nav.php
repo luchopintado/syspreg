@@ -16,10 +16,10 @@
                         <li><a href="#contact">Contacto</a></li>
                     <?php else: ?>
                         <?php if($_SESSION["menu"] === "academico"): ?>
-                            <li class="active"><a href="admin.php">Acad&eacute;mico</a></li>
+                            <li class="active"><a href="admin.php">Administrador</a></li>
                             <li><a href="admin_eval.php">Evaluaciones</a></li>                    
                         <?php elseif($_SESSION["menu"] === "evaluaciones"): ?>
-                            <li><a href="admin.php">Acad&eacute;mico</a></li>
+                            <li><a href="admin.php">Administrador</a></li>
                             <li class="active"><a href="admin_eval.php">Evaluaciones</a></li>                    
                         <?php endif; ?>
                     <?php endif; ?>

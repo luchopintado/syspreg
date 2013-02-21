@@ -1,5 +1,5 @@
 <?php $submenu = array(
-    new Menu(array("indice"=>"ingresar", "nombre"=>"Ingresar pregunta al Banco",    "url"=>"./admin_eval.php?action=ingresarPregunta")),
+    
     new Menu(array("indice"=>"generar",       "nombre"=>"Generar Evaluaci&oacute;n",   "url"=>"./admin_eval.php?action=generarEvaluacion")),
     new Menu(array("indice"=>"listar",    "nombre"=>"Ex&aacute;menes Anteriores",      "url"=>"./admin_eval.php?action=listExamenes"))
 );?>

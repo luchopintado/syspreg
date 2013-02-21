@@ -4,7 +4,8 @@
     new Menu(array("indice"=>"cursos",      "nombre"=>"Cursos",         "url"=>"./admin.php?action=listCursos")),
     new Menu(array("indice"=>"cursosgrados",      "nombre"=>"Asignar Cursos-Grados",         "url"=>"./admin.php?action=listCursosgrados")),
     new Menu(array("indice"=>"temas",       "nombre"=>"Temas",          "url"=>"./admin.php?action=listTemas")),
-    new Menu(array("indice"=>"subtemas",    "nombre"=>"Sub Temas",      "url"=>"./admin.php?action=listSubtemas"))
+    new Menu(array("indice"=>"subtemas",    "nombre"=>"Sub Temas",      "url"=>"./admin.php?action=listSubtemas")),
+    new Menu(array("indice"=>"ingresar", "nombre"=>"Ingresar pregunta al Banco",    "url"=>"./admin.php?action=ingresarPregunta"))
 );?>
 
 <div class="well sidebar-nav">

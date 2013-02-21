@@ -137,6 +137,19 @@ switch ($action) {
         break;
         
     
+    /* PREGUNTAS*/
+     case 'ingresarPregunta':
+        formIngresarPregunta();
+        break;
+    
+    case 'saveQuestion':
+        saveQuestion();
+        break;
+    
+    case 'saveEvaluation':
+        saveEvaluation();
+        break;
+    
     
     
     default:
@@ -497,7 +510,7 @@ function editTema() {
         }
         $tema->storeFormValues($_POST);
         $tema->update();
-        header("Location: admin.php?status=changesSaved");
+        header("Location: admin.php?action=listTemas&status=changesSaved");
     } elseif(isset ($_POST["cancel"])){
         header("Location: admin.php?action=listTemas");
     } else{
@@ -562,6 +575,7 @@ function newSubTema() {
     $results["formAction"] = "newSubtema";
     $results["indice"] = "subtemas";
 
+    //print_r($_POST);return;
     if (isset($_POST["saveChanges"])) {
         $subtema = new SubTema;
         $subtema->storeFormValues($_POST);
@@ -706,4 +720,77 @@ function deleteCursoGrado() {
     header("Location: admin.php?action=listCursosgrados&status=articleDeleted");
 }
 
+
+function formIngresarPregunta() {
+    $results = array();
+    
+    $data = Area::getList();
+    //$results["areas"] = $data["areas"];
+    $results["totalRows"] = $data["totalRows"];
+    $results["pageTitle"] = "Ingresar pregunta al banco";
+    $results["indice"] = "ingresar";
+    $results["formAction"] = "saveQuestion";
+    
+    if(isset($_GET["error"])){
+        if($_GET["error"] == "articleNotFound"){
+            $results["errorMessage"] = MESSAGE_ARTICLE_NOT_FOUND;
+        }
+    }
+    
+    if(isset($_GET["status"])){
+        if($_GET["status"] == "changesSaved"){
+            $results["statusMessage"] = MESSAGE_CHANGES_SAVED;
+        }
+        if($_GET["status"] == "articleDeleted"){
+            $results["statusMessage"] = MESSAGE_ARTICLE_DELETED;
+        }
+    }
+    //print_r($results);
+    //return;
+    if($data["totalRows"] == 0){
+        require TEMPLATE_PATH . "/admin_eval/ingresarPregunta.php";        
+    }else{
+        require TEMPLATE_PATH . "/admin_eval/ingresarPregunta.php";
+        
+    }
+}
+
+
+
+function saveQuestion() {
+    $question = new Pregunta;
+    $question->storeFormValues($_POST);
+    //print_r($_POST);return;
+    $mysqli = $question->insert();
+    $insert_id = $mysqli->insert_id;
+    if($mysqli->affected_rows == 1){
+        $alts = $_POST["alt"];
+        $resps = $_POST["resp"];
+        for($i=0; $i<5; $i++){
+            $alternativa = new Alternativa;
+            $options = array("cod_alternativa"=>"", "cod_pregunta"=>$insert_id, "valor"=> urldecode($alts[$i]), "correcta"=>($resps[$i]==="true"?1:0));
+            $alternativa->storeFormValues($options);
+            $alternativa->insert();
+        }
+        return array("success"=>true);
+    }else{
+        return array("success"=>false);
+    }
+}
+
+function saveEvaluation(){
+    
+    $evaluacion = new Evaluacion;
+    $evaluacion->storeFormValues($_POST);
+    $mysqli = $evaluacion->insert();
+    $insert_id = $mysqli->insert_id;
+    return;
+    if($mysqli->affected_rows == 1){
+        $preguntas = unserialize($_SESSION["preguntas"]);
+        $evaluacion->savePreguntas($preguntas);
+        return array("success"=>true);
+    }else{
+        return array("success"=>false);
+    }
+}
 ?>

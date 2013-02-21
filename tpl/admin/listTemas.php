@@ -58,7 +58,7 @@
                                     <td><?php echo ++$i; ?></td>
                                     <td><?php echo $tema->tema; ?></td>
                                     <td><?php echo $tema->obj_curso->curso; ?></td>
-                                    <td><?php echo $tema->obj_grado->grado, ' - ', $tema->obj_grado->obj_nivel->nivel; ?></td>
+                                    <td><?php echo $tema->obj_grado->grado, ' - ', $tema->obj_grado->obj_nivel->niveldificultad; ?></td>
                                     <td>Trimestre <?php echo $tema->obj_trimestre->trimestre; ?></td>
                                     <td>
                                         <div class="btn-group">

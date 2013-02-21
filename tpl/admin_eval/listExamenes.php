@@ -43,7 +43,7 @@
                                         <option value="0">Seleccionar...</option>
                                         <?php $niveles = Nivel::getList();?>
                                         <?php foreach ($niveles["niveles"] as $nivel): ?>
-                                            <option value="<?php echo $nivel->cod_nivel?>"><?php echo $nivel->nivel;?></option>                                            
+                                            <option value="<?php echo $nivel->cod_nivel?>"><?php echo $nivel->niveldificultad;?></option>                                            
                                         <?php endforeach; ?>
                                     </select>                                    
                                 </div>

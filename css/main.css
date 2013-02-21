@@ -57,12 +57,18 @@ html, body {
     -moz-border-radius: 4px;
     border-radius: 4px;
 }
-.editor{
-    height: 100px;
-}
+
 
 ol.alternativas{
     list-style: upper-alpha;    
+}
+ol.alternativas li{
+    position: relative;
+}
+ol.alternativas li a.close{
+    position: absolute;
+    top: 2px;
+    right: 6px;
 }
 
 #render-eval{
@@ -73,4 +79,33 @@ ol.alternativas{
 }
 #render-eval ol li ol{
     list-style: upper-alpha;    
+}
+
+.modal-enunciado{
+    width: 750px;
+}
+.tinyeditor-header select{
+    margin-top: 0 !important;
+}
+.tinyeditor textarea{
+    clear: both;
+    width: 98%;    
+}
+.tinyeditor iframe{
+    clear: both;
+}
+.modal-body {
+    max-height: 540px;
+}
+.modal.fade.in{
+    top: 40%;
+}
+.sharemath{
+    height: 262px;
+    overflow: hidden;
+}
+
+
+.modal-preguntas{
+    width: 750px;
 }
